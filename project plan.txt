@@ -1,0 +1,13 @@
+CSC 1012 - Smart Hospital and Resource Allocation System
+
+Project Plan
+1.Set up project structure
+2.Create hospital lookup data
+3.Implement patient registration
+4.Implement bed allocation
+5.Implement waiting time calculation
+6.Implement billing calculations
+7.Implement patient priority sorting
+8.Implement reports and analytics
+9.Add file handling
+10.Test and improve the system
