@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 float calcConsultationCost(int selectedSpecialty,const float consultationFee[]);
-
+float calcWaitTime(int selectedSpecialty,const int queueCount[],const int consultationTime[]);
 int main()
 {   char patientName[60];
     int age;
@@ -11,6 +11,7 @@ int main()
     int selectedWard;
     int admittedDays;
     float consultationCost;
+    int waitTime;
     const int specialtyId[4]={1,2,3,4};
     const char specialtyName[4][30]={"General Practice(OPD)","Paediatrics","Cardiology","Neurology"};
     const float consultationFee[4]={1500.00,2500.00,4500.00,5000.00};
@@ -20,6 +21,7 @@ int main()
     const char wardName[4][30]={"General ward","Paediatric ward","Surgical ward","ICU (Intensive Care Unit)"};
     const float dailyBedRate[4]={3000.00,6000.00,12000.00,25000.00};
     const int totalBedCapacity[4]={20,10,10,5};
+    int queueCount[4]={0};
     int i;
     printf("Smart Hospital & Resource Allocation System\n\n");
 
@@ -81,6 +83,9 @@ int main()
 
     consultationCost=calcConsultationCost(selectedSpecialty,consultationFee);
 
+    waitTime=calcWaitTime(selectedSpecialty,queueCount,consultationTime);
+    queueCount[selectedSpecialty-1]++;
+
 
 
 
@@ -90,5 +95,13 @@ int main()
 float calcConsultationCost(int selectedSpecialty,const float consultationFee[])
 {
     return consultationFee[selectedSpecialty-1];
+}
+
+float calcWaitTime(int selectedSpecialty,const int queueCount[],const int consultationTime[])
+{
+    int time;
+    time=queueCount[selectedSpecialty-1]*consultationTime[selectedSpecialty-1];
+
+    return time;
 }
 
