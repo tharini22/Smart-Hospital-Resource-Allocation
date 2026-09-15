@@ -2,7 +2,13 @@
 #include <stdlib.h>
 
 int main()
-{
+{   char patientName[60];
+    int age;
+    int urgency;
+    int selectedSpecialty;
+    int admitted;
+    int selectedWard;
+    int admittedDays;
     const int specialtyId[4]={1,2,3,4};
     const char specialtyName[4][30]={"General Practice(OPD)","Paediatrics","Cardiology","Neurology"};
     const float consultationFee[4]={1500.00,2500.00,4500.00,5000.00};
@@ -15,7 +21,46 @@ int main()
     int i;
     printf("Smart Hospital & Resource Allocation System\n\n");
 
-    printf("Doctor Specialties\n\n");
+    printf("\nEnter patient name: ");
+    scanf("%s", patientName);
+    printf("Enter age: ");
+    scanf("%d",&age);
+    printf("Enter urgency (1-Normal,2-Urgent,3-Critical): ");
+    scanf("%d",&urgency);
+    if(urgency < 1 || urgency > 3)
+    {
+        printf("Invalid urgency!\n");
+    }
+    printf("Enter specialty ID: ");
+    scanf("%d",&selectedSpecialty);
+    if(selectedSpecialty < 1 || selectedSpecialty > 4)
+    {
+        printf("Invalid specialty ID!\n");
+    }
+    printf("Is the patient admitted to ward? (1-Yes,0-No): ");
+    scanf("%d",&admitted);
+
+    if(admitted==1)
+    {
+        printf("Enter ward ID (1 to 4): ");
+        scanf("%d",&selectedWard);
+        if(selectedWard < 1 || selectedWard > 4)
+        {
+            printf("Invalid ward ID!\n");
+        }
+        printf("Enter number of days admitted: ");
+        scanf("%d",&admittedDays);
+        if(admittedDays <= 0)
+        {
+            printf("Invalid number of admitted Days!\n");
+        }
+    }
+    else
+    {
+        admittedDays=0;
+    }
+
+    printf("\nDoctor Specialties\n\n");
 
     printf("%-4s  %-25s %-12s    %-10s    %-5s\n","Specialty ID","Specialty Name","Base Consultation Fee","Consultation Time/Patient","Daily Patient Cap\n");
     for(i=0;i<4;i++)
