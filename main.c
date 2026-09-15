@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+float calcConsultationCost(int selectedSpecialty,const float consultationFee[]);
 
 int main()
 {   char patientName[60];
@@ -9,6 +10,7 @@ int main()
     int admitted;
     int selectedWard;
     int admittedDays;
+    float consultationCost;
     const int specialtyId[4]={1,2,3,4};
     const char specialtyName[4][30]={"General Practice(OPD)","Paediatrics","Cardiology","Neurology"};
     const float consultationFee[4]={1500.00,2500.00,4500.00,5000.00};
@@ -77,8 +79,16 @@ int main()
 
     int bedOccupancy[4][20]={0};
 
+    consultationCost=calcConsultationCost(selectedSpecialty,consultationFee);
+
+
 
 
 
     return 0;
 }
+float calcConsultationCost(int selectedSpecialty,const float consultationFee[])
+{
+    return consultationFee[selectedSpecialty-1];
+}
+
