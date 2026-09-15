@@ -5,6 +5,7 @@ float calcWaitTime(int selectedSpecialty,const int queueCount[],const int consul
 float calcEmergencySurcharge(int urgency,float consultationCost);
 float calcWardCost(int selectedWard,int admittedDays,const float wardDailyBedRate[]);
 float calcGrossTotal(float consultationCost,float emergencySurcharge,float wardCost);
+float calcAgeSubsidy(int age,float grossTotal);
 int main()
 {   char patientName[60];
     int age;
@@ -18,6 +19,7 @@ int main()
     float emergencySurcharge;
     float wardCost;
     float grossTotal;
+    float ageSubsidyDiscount;
     const int specialtyId[4]={1,2,3,4};
     const char specialtyName[4][30]={"General Practice(OPD)","Paediatrics","Cardiology","Neurology"};
     const float consultationFee[4]={1500.00,2500.00,4500.00,5000.00};
@@ -98,6 +100,9 @@ int main()
 
     grossTotal=calcGrossTotal(consultationCost,emergencySurcharge,wardCost);
 
+    ageSubsidyDiscount = calcAgeSubsidy(age,grossTotal);
+
+
 
 
 
@@ -156,4 +161,18 @@ float calcGrossTotal(float consultationCost,float emergencySurcharge,float wardC
     float total;
     total=consultationCost+emergencySurcharge+wardCost;
     return total;
+}
+
+float calcAgeSubsidy(int age,float grossTotal)
+{
+    float discount;
+    if(age < 5 || age > 65)
+    {
+        discount = grossTotal*0.15;
+    }
+    else
+    {
+        discount = 0;
+    }
+    return discount;
 }
