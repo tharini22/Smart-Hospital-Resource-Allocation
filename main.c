@@ -6,6 +6,7 @@ float calcEmergencySurcharge(int urgency,float consultationCost);
 float calcWardCost(int selectedWard,int admittedDays,const float wardDailyBedRate[]);
 float calcGrossTotal(float consultationCost,float emergencySurcharge,float wardCost);
 float calcAgeSubsidy(int age,float grossTotal);
+float calcFinalPayable(float grossTotal,float ageSubsidyDiscount);
 int main()
 {   char patientName[60];
     int age;
@@ -20,6 +21,7 @@ int main()
     float wardCost;
     float grossTotal;
     float ageSubsidyDiscount;
+    float finalPayable;
     const int specialtyId[4]={1,2,3,4};
     const char specialtyName[4][30]={"General Practice(OPD)","Paediatrics","Cardiology","Neurology"};
     const float consultationFee[4]={1500.00,2500.00,4500.00,5000.00};
@@ -102,6 +104,9 @@ int main()
 
     ageSubsidyDiscount = calcAgeSubsidy(age,grossTotal);
 
+    finalPayable = calcFinalPayable(grossTotal,ageSubsidyDiscount);
+
+
 
 
 
@@ -175,4 +180,11 @@ float calcAgeSubsidy(int age,float grossTotal)
         discount = 0;
     }
     return discount;
+}
+
+float calcFinalPayable(float grossTotal,float ageSubsidyDiscount)
+{
+    float amount;
+    amount = grossTotal - ageSubsidyDiscount;
+    return amount;
 }
