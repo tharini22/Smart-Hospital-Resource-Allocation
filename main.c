@@ -2,6 +2,7 @@
 #include <stdlib.h>
 float calcConsultationCost(int selectedSpecialty,const float consultationFee[]);
 float calcWaitTime(int selectedSpecialty,const int queueCount[],const int consultationTime[]);
+float calcEmergencySurcharge(int urgency,float consultationCost);
 int main()
 {   char patientName[60];
     int age;
@@ -12,6 +13,7 @@ int main()
     int admittedDays;
     float consultationCost;
     int waitTime;
+    float emergencySurcharge;
     const int specialtyId[4]={1,2,3,4};
     const char specialtyName[4][30]={"General Practice(OPD)","Paediatrics","Cardiology","Neurology"};
     const float consultationFee[4]={1500.00,2500.00,4500.00,5000.00};
@@ -86,6 +88,8 @@ int main()
     waitTime=calcWaitTime(selectedSpecialty,queueCount,consultationTime);
     queueCount[selectedSpecialty-1]++;
 
+    emergencySurcharge = calcEmergencySurcharge(urgency,consultationCost);
+
 
 
 
@@ -103,5 +107,23 @@ float calcWaitTime(int selectedSpecialty,const int queueCount[],const int consul
     time=queueCount[selectedSpecialty-1]*consultationTime[selectedSpecialty-1];
 
     return time;
+}
+
+float calcEmergencySurcharge(int urgency,float consultationCost)
+{
+    float charge;
+    if(urgency==1)
+    {
+        charge=0;
+    }
+    else if(urgency==2)
+    {
+        charge=consultationCost*0.20;
+    }
+    else
+    {
+        charge=consultationCost*0.50;
+    }
+    return charge;
 }
 
