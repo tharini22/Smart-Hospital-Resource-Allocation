@@ -4,6 +4,7 @@ float calcConsultationCost(int selectedSpecialty,const float consultationFee[]);
 float calcWaitTime(int selectedSpecialty,const int queueCount[],const int consultationTime[]);
 float calcEmergencySurcharge(int urgency,float consultationCost);
 float calcWardCost(int selectedWard,int admittedDays,const float wardDailyBedRate[]);
+float calcGrossTotal(float consultationCost,float emergencySurcharge,float wardCost);
 int main()
 {   char patientName[60];
     int age;
@@ -16,6 +17,7 @@ int main()
     int waitTime;
     float emergencySurcharge;
     float wardCost;
+    float grossTotal;
     const int specialtyId[4]={1,2,3,4};
     const char specialtyName[4][30]={"General Practice(OPD)","Paediatrics","Cardiology","Neurology"};
     const float consultationFee[4]={1500.00,2500.00,4500.00,5000.00};
@@ -94,6 +96,9 @@ int main()
 
     wardCost = calcWardCost(selectedWard,admittedDays,wardDailyBedRate);
 
+    grossTotal=calcGrossTotal(consultationCost,emergencySurcharge,wardCost);
+
+
 
 
 
@@ -144,4 +149,11 @@ float calcWardCost(int selectedWard,int admittedDays,const float wardDailyBedRat
         cost=admittedDays*wardDailyBedRate[selectedWard-1];
     }
     return cost;
+}
+
+float calcGrossTotal(float consultationCost,float emergencySurcharge,float wardCost)
+{
+    float total;
+    total=consultationCost+emergencySurcharge+wardCost;
+    return total;
 }
