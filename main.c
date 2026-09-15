@@ -3,6 +3,7 @@
 float calcConsultationCost(int selectedSpecialty,const float consultationFee[]);
 float calcWaitTime(int selectedSpecialty,const int queueCount[],const int consultationTime[]);
 float calcEmergencySurcharge(int urgency,float consultationCost);
+float calcWardCost(int selectedWard,int admittedDays,const float wardDailyBedRate[]);
 int main()
 {   char patientName[60];
     int age;
@@ -14,6 +15,7 @@ int main()
     float consultationCost;
     int waitTime;
     float emergencySurcharge;
+    float wardCost;
     const int specialtyId[4]={1,2,3,4};
     const char specialtyName[4][30]={"General Practice(OPD)","Paediatrics","Cardiology","Neurology"};
     const float consultationFee[4]={1500.00,2500.00,4500.00,5000.00};
@@ -21,7 +23,7 @@ int main()
     const int dailyPatientCap[4]={30,20,12,10};
     const int wardID[4]={1,2,3,4};
     const char wardName[4][30]={"General ward","Paediatric ward","Surgical ward","ICU (Intensive Care Unit)"};
-    const float dailyBedRate[4]={3000.00,6000.00,12000.00,25000.00};
+    const float wardDailyBedRate[4]={3000.00,6000.00,12000.00,25000.00};
     const int totalBedCapacity[4]={20,10,10,5};
     int queueCount[4]={0};
     int i;
@@ -62,8 +64,8 @@ int main()
         }
     }
     else
-    {
-        admittedDays=0;
+    {   selectedWard = 0;
+        admittedDays = 0;
     }
 
     printf("\nDoctor Specialties\n\n");
@@ -78,7 +80,7 @@ int main()
     printf("\t%-10s %-30s %-15s %-10s\n","Ward ID","Ward Name","Daily Bed Rate","Total Bed Capacity");
     for(i=0;i<4;i++)
     {
-        printf("\t%-10d %-30s %-15.2f %-10d\n ",wardID[i],wardName[i],dailyBedRate[i],totalBedCapacity[i]);
+        printf("\t%-10d %-30s %-15.2f %-10d\n ",wardID[i],wardName[i],wardDailyBedRate[i],totalBedCapacity[i]);
     }
 
     int bedOccupancy[4][20]={0};
@@ -89,6 +91,9 @@ int main()
     queueCount[selectedSpecialty-1]++;
 
     emergencySurcharge = calcEmergencySurcharge(urgency,consultationCost);
+
+    wardCost = calcWardCost(selectedWard,admittedDays,wardDailyBedRate);
+
 
 
 
@@ -127,3 +132,16 @@ float calcEmergencySurcharge(int urgency,float consultationCost)
     return charge;
 }
 
+float calcWardCost(int selectedWard,int admittedDays,const float wardDailyBedRate[])
+{
+    float cost;
+    if(admittedDays==0)
+    {
+        cost=0;
+    }
+    else
+    {
+        cost=admittedDays*wardDailyBedRate[selectedWard-1];
+    }
+    return cost;
+}
