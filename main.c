@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#define MAX_PATIENTS 100
 float calcConsultationCost(int selectedSpecialty,const float consultationFee[]);
 float calcWaitTime(int selectedSpecialty,const int queueCount[],const int consultationTime[]);
 float calcEmergencySurcharge(int urgency,float consultationCost);
@@ -8,6 +10,7 @@ float calcGrossTotal(float consultationCost,float emergencySurcharge,float wardC
 float calcAgeSubsidy(int age,float grossTotal);
 float calcFinalPayable(float grossTotal,float ageSubsidyDiscount);
 int main()
+
 {   char patientName[60];
     int age;
     int urgency;
@@ -15,6 +18,25 @@ int main()
     int admitted;
     int selectedWard;
     int admittedDays;
+
+    char patientsName[MAX_PATIENTS][50];
+    int patientAge[MAX_PATIENTS];
+    int patientUrgency[MAX_PATIENTS];
+    int patientSpecialty[MAX_PATIENTS];
+    int patientAdmitted[MAX_PATIENTS];
+    int patientWard[MAX_PATIENTS];
+    int patientDays[MAX_PATIENTS];
+
+    int patients;
+
+    float patientConsultationCost[MAX_PATIENTS];
+    int patientWaitTime[MAX_PATIENTS];
+    float patientEmergencySurcharge[MAX_PATIENTS];
+    float patientWardCost[MAX_PATIENTS];
+    float patientGrossTotal[MAX_PATIENTS];
+    float patientAgeSubsidyDiscount[MAX_PATIENTS];
+    float patientFinalPayable[MAX_PATIENTS];
+
     float consultationCost;
     int waitTime;
     float emergencySurcharge;
@@ -31,47 +53,54 @@ int main()
     const char wardName[4][30]={"General ward","Paediatric ward","Surgical ward","ICU (Intensive Care Unit)"};
     const float wardDailyBedRate[4]={3000.00,6000.00,12000.00,25000.00};
     const int totalBedCapacity[4]={20,10,10,5};
+
     int queueCount[4]={0};
     int i;
+
     printf("Smart Hospital & Resource Allocation System\n\n");
 
-    printf("\nEnter patient name: ");
-    scanf("%s", patientName);
-    printf("Enter age: ");
-    scanf("%d",&age);
-    printf("Enter urgency (1-Normal,2-Urgent,3-Critical): ");
-    scanf("%d",&urgency);
-    if(urgency < 1 || urgency > 3)
-    {
-        printf("Invalid urgency!\n");
-    }
-    printf("Enter specialty ID: ");
-    scanf("%d",&selectedSpecialty);
-    if(selectedSpecialty < 1 || selectedSpecialty > 4)
-    {
-        printf("Invalid specialty ID!\n");
-    }
-    printf("Is the patient admitted to ward? (1-Yes,0-No): ");
-    scanf("%d",&admitted);
 
-    if(admitted==1)
+    printf("Enter number of patients : ");
+    scanf("%d",&patients);
+
+    for(i=0;i<patients;i++)
     {
-        printf("Enter ward ID (1 to 4): ");
-        scanf("%d",&selectedWard);
-        if(selectedWard < 1 || selectedWard > 4)
+        printf("\nEnter patient name: ");
+        scanf("%s", patientsName[i]);
+        printf("Enter age: ");
+        scanf("%d",&patientAge[i]);
+        printf("Enter urgency (1-Normal,2-Urgent,3-Critical): ");
+        scanf("%d",&patientUrgency[i]);
+        if(patientUrgency[i] < 1 || patientUrgency[i] > 3)
         {
-            printf("Invalid ward ID!\n");
+            printf("Invalid urgency!\n");
         }
-        printf("Enter number of days admitted: ");
-        scanf("%d",&admittedDays);
-        if(admittedDays <= 0)
+        printf("Enter specialty ID: ");
+        scanf("%d",&patientSpecialty[i]);
+        if(patientSpecialty[i] < 1 || patientSpecialty[i] > 4)
         {
-            printf("Invalid number of admitted Days!\n");
+            printf("Invalid specialty ID!\n");
         }
-    }
-    else
-    {   selectedWard = 0;
-        admittedDays = 0;
+        printf("Is the patient admitted to ward? (1-Yes,0-No): ");
+        scanf("%d",&patientAdmitted[i]);
+        if(patientAdmitted[i]==1)
+        {
+            printf("Enter ward ID (1 to 4): ");
+            scanf("%d",&patientWard[i]);
+            if(patientWard[i] < 1 || patientWard[i] > 4)
+            {
+                printf("Invalid ward ID!\n");
+            }
+            printf("Enter number of days admitted: ");
+            scanf("%d",&patientDays[i]);
+            if(patientDays[i] <= 0)
+            {
+                printf("Invalid number of admitted Days!\n");
+            }
+
+        }
+
+
     }
 
     printf("\nDoctor Specialties\n\n");
@@ -91,31 +120,54 @@ int main()
 
     int bedOccupancy[4][20]={0};
 
-    consultationCost=calcConsultationCost(selectedSpecialty,consultationFee);
+    for(i=0;i<patients;i++)
+    {
+        patientConsultationCost[i]=calcConsultationCost(patientSpecialty[i],consultationFee);
 
-    waitTime=calcWaitTime(selectedSpecialty,queueCount,consultationTime);
-    queueCount[selectedSpecialty-1]++;
+    }
 
-    emergencySurcharge = calcEmergencySurcharge(urgency,consultationCost);
+    for(i=0;i<patients;i++)
+    {
+        patientWaitTime[i]=calcWaitTime(patientSpecialty[i],queueCount,consultationTime);
+        queueCount[patientSpecialty[i]-1]++;
 
-    wardCost = calcWardCost(selectedWard,admittedDays,wardDailyBedRate);
+    }
 
-    grossTotal=calcGrossTotal(consultationCost,emergencySurcharge,wardCost);
+    for(i=0;i<patients;i++)
+    {
+        patientEmergencySurcharge[i]=calcEmergencySurcharge(patientUrgency[i],patientConsultationCost[i]);
+    }
 
-    ageSubsidyDiscount = calcAgeSubsidy(age,grossTotal);
+    for(i=0;i<patients;i++)
+    {
+        if(patientAdmitted[i]==1)
+        {
+           patientWardCost[i]=calcWardCost(patientWard[i],patientDays[i],wardDailyBedRate);
+        }
+        else
+        {
+            patientWardCost[i]=0;
+        }
+    }
 
-    finalPayable = calcFinalPayable(grossTotal,ageSubsidyDiscount);
+    for(i=0;i<patients;i++)
+    {
+        patientGrossTotal[i]=calcGrossTotal(patientConsultationCost[i],patientEmergencySurcharge[i],patientWardCost[i]);
+    }
 
+    for(i=0;i<patients;i++)
+    {
+        patientAgeSubsidyDiscount[i]=calcAgeSubsidy(patientAge[i],patientGrossTotal[i]);
+    }
 
-
-
-
-
-
-
-
+    for(i=0;i<patients;i++)
+    {
+        patientFinalPayable[i]=calcFinalPayable(patientGrossTotal[i],patientAgeSubsidyDiscount[i]);
+    }
     return 0;
 }
+
+
 float calcConsultationCost(int selectedSpecialty,const float consultationFee[])
 {
     return consultationFee[selectedSpecialty-1];
