@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include<string.h>
 
 #define MAX_PATIENTS 100
 float calcConsultationCost(int selectedSpecialty,const float consultationFee[]);
@@ -9,6 +10,7 @@ float calcWardCost(int selectedWard,int admittedDays,const float wardDailyBedRat
 float calcGrossTotal(float consultationCost,float emergencySurcharge,float wardCost);
 float calcAgeSubsidy(int age,float grossTotal);
 float calcFinalPayable(float grossTotal,float ageSubsidyDiscount);
+void sortPatientByPriority(int patients,char patientsName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[],int patientAdmitted[],int patientWard[],int patientDays[]);
 int main()
 
 {   char patientName[60];
@@ -102,6 +104,20 @@ int main()
 
 
     }
+
+
+
+    sortPatientByPriority(patients,patientsName,patientAge,patientUrgency,patientSpecialty,patientAdmitted,patientWard,patientDays);
+    printf("\nPatients in priority order: \n");
+    printf("-------------------------------------------------------------------\n");
+    printf("%-5s %-20s %-10s\n","No","patient name","urgency");
+    printf("-------------------------------------------------------------------\n");
+
+    for(i=0;i<patients;i++)
+    {
+        printf("%-5d %-20s %-10d\n",i+1,patientsName[i],patientUrgency[i]);
+    }
+    printf("-------------------------------------------------------------------\n");
 
     printf("\nDoctor Specialties\n\n");
 
@@ -240,3 +256,49 @@ float calcFinalPayable(float grossTotal,float ageSubsidyDiscount)
     amount = grossTotal - ageSubsidyDiscount;
     return amount;
 }
+
+void sortPatientByPriority(int patients,char patientsName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[],int patientAdmitted[],int patientWard[],int patientDays[])
+{
+    int i,j;
+    int temp;
+    char tempName[50];
+
+    for(i=0;i<patients-1;i++)
+    {
+        for(j=0;j<patients-i-1;j++)
+        {
+            if(patientUrgency[j]<patientUrgency[j+1])
+            {
+                temp=patientUrgency[j];
+                patientUrgency[j]=patientUrgency[j+1];
+                patientUrgency[j+1]=temp;
+
+                strcpy(tempName,patientsName[j]);
+                strcpy(patientsName[j],patientsName[j+1]);
+                strcpy(patientsName[j+1],tempName);
+
+                temp=patientAge[j];
+                patientAge[j]=patientAge[j+1];
+                patientAge[j+1]=temp;
+
+                temp=patientSpecialty[j];
+                patientSpecialty[j]=patientSpecialty[j+1];
+                patientSpecialty[j+1]=temp;
+
+                temp=patientAdmitted[j];
+                patientAdmitted[j]=patientAdmitted[j+1];
+                patientAdmitted[j+1]=temp;
+
+                temp=patientWard[j];
+                patientWard[j]=patientWard[j+1];
+                patientWard[j+1]=temp;
+
+                temp=patientDays[j];
+                patientDays[j]=patientDays[j+1];
+                patientDays[j+1]=temp;
+
+            }
+        }
+    }
+}
+
