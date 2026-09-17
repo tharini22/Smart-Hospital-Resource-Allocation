@@ -10,7 +10,13 @@ float calcWardCost(int selectedWard,int admittedDays,const float wardDailyBedRat
 float calcGrossTotal(float consultationCost,float emergencySurcharge,float wardCost);
 float calcAgeSubsidy(int age,float grossTotal);
 float calcFinalPayable(float grossTotal,float ageSubsidyDiscount);
-void sortPatientByPriority(int patients,char patientsName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[],int patientAdmitted[],int patientWard[],int patientDays[]);
+void sortPatientByPriority(int patients,char patientsName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[],
+                           int patientAdmitted[],int patientWard[],int patientDays[]);
+void displayBill(char patientName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[],const char specialtyName[][30],int patientAdmitted[],int patientWard[],
+                 int patientBed[],const char wardName[][30],int patientDays[],float patientConsultationCost[],int patientWaitTime[],float patientEmergencySurcharge[],float patientWardCost[],
+                 float patientGrossTotal[],float patientAgeSubsidyDiscount[],float patientFinalPayable[],int patients);
+
+int assignBed(int selectedWard,int bedOccupancy[][20]);
 int main()
 
 {   char patientName[60];
@@ -58,6 +64,10 @@ int main()
 
     int queueCount[4]={0};
     int i;
+
+    int bedOccupancy[4][20]={0};
+    int patientBed[MAX_PATIENTS];
+
 
     printf("Smart Hospital & Resource Allocation System\n\n");
 
@@ -108,20 +118,23 @@ int main()
 
 
     sortPatientByPriority(patients,patientsName,patientAge,patientUrgency,patientSpecialty,patientAdmitted,patientWard,patientDays);
-    printf("\nPatients in priority order: \n");
-    printf("-------------------------------------------------------------------\n");
+    printf("\nPatients in priority order: \n\n");
+    printf("------------------------------------------------------------\n");
     printf("%-5s %-20s %-10s\n","No","patient name","urgency");
-    printf("-------------------------------------------------------------------\n");
+    printf("------------------------------------------------------------\n");
+
 
     for(i=0;i<patients;i++)
     {
         printf("%-5d %-20s %-10d\n",i+1,patientsName[i],patientUrgency[i]);
     }
-    printf("-------------------------------------------------------------------\n");
+    printf("------------------------------------------------------------\n");
 
     printf("\nDoctor Specialties\n\n");
 
     printf("%-4s  %-25s %-12s    %-10s    %-5s\n","Specialty ID","Specialty Name","Base Consultation Fee","Consultation Time/Patient","Daily Patient Cap\n");
+
+
     for(i=0;i<4;i++)
     {
         printf("\t%-4d %-25s %-12.2f\t\t\t%-10d\t\t\t%-5d\n",specialtyId[i],specialtyName[i],consultationFee[i],consultationTime[i],dailyPatientCap[i]);
@@ -129,18 +142,20 @@ int main()
 
     printf("\nHospital Wards\n\n");
     printf("\t%-10s %-30s %-15s %-10s\n","Ward ID","Ward Name","Daily Bed Rate","Total Bed Capacity");
+
+
     for(i=0;i<4;i++)
     {
         printf("\t%-10d %-30s %-15.2f %-10d\n ",wardID[i],wardName[i],wardDailyBedRate[i],totalBedCapacity[i]);
     }
 
-    int bedOccupancy[4][20]={0};
 
     for(i=0;i<patients;i++)
     {
         patientConsultationCost[i]=calcConsultationCost(patientSpecialty[i],consultationFee);
 
     }
+
 
     for(i=0;i<patients;i++)
     {
@@ -149,10 +164,12 @@ int main()
 
     }
 
+
     for(i=0;i<patients;i++)
     {
         patientEmergencySurcharge[i]=calcEmergencySurcharge(patientUrgency[i],patientConsultationCost[i]);
     }
+
 
     for(i=0;i<patients;i++)
     {
@@ -166,22 +183,51 @@ int main()
         }
     }
 
+
     for(i=0;i<patients;i++)
     {
         patientGrossTotal[i]=calcGrossTotal(patientConsultationCost[i],patientEmergencySurcharge[i],patientWardCost[i]);
     }
+
 
     for(i=0;i<patients;i++)
     {
         patientAgeSubsidyDiscount[i]=calcAgeSubsidy(patientAge[i],patientGrossTotal[i]);
     }
 
+
     for(i=0;i<patients;i++)
     {
         patientFinalPayable[i]=calcFinalPayable(patientGrossTotal[i],patientAgeSubsidyDiscount[i]);
     }
+
+
+    for(i=0;i<patients;i++)
+    {
+        if(patientAdmitted[i]==1)
+        {
+            patientBed[i]=assignBed(patientWard[i],bedOccupancy);
+        }
+        else
+        {
+            patientBed[i]=0;
+        }
+    }
+
+
+
+
+
+    displayBill(patientsName,patientAge,patientUrgency,patientSpecialty,specialtyName,patientAdmitted,patientWard,patientBed,wardName,patientDays,
+                patientConsultationCost,patientWaitTime,patientEmergencySurcharge,patientWardCost,patientGrossTotal,patientAgeSubsidyDiscount,patientFinalPayable,patients);
+
+
     return 0;
+
 }
+
+
+
 
 
 float calcConsultationCost(int selectedSpecialty,const float consultationFee[])
@@ -300,5 +346,95 @@ void sortPatientByPriority(int patients,char patientsName[][50],int patientAge[]
             }
         }
     }
+}
+
+
+void displayBill(char patientsName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[],const char specialtyName[][30],int patientAdmitted[],int patientWard[],
+                  int patientBed[],const char wardName[][30],int patientDays[],float patientConsultationCost[],int patientWaitTime[],float patientEmergencySurcharge[],float patientWardCost[],
+                 float patientGrossTotal[],float patientAgeSubsidyDiscount[],float patientFinalPayable[],int patients)
+
+{   int i;
+
+    for(i=0;i<patients;i++)
+    {
+        printf("=======================================================\n");
+        printf("\tSMART HOSPITAL ADMISSION & BILL\t\n");
+        printf("-------------------------------------------------------\n");
+
+        printf("Patient Name             : %s\n", patientsName[i]);
+
+        if(patientAge[i] < 5 || patientAge[i] > 65)
+        {
+            printf("Age               : %d Years (15%% Subsidy Eligible)\n",patientAge[i]);
+        }
+        else
+        {
+            printf("Age               : %d Years\n", patientAge[i]);
+        }
+
+
+        printf("Specialty             : %s\n", specialtyName[patientSpecialty[i]-1]);
+        if(patientAdmitted[i]==1)
+        {
+            printf("Assigned Ward     : %s (Bed #%02d)\n",wardName[patientWard[i]-1],patientBed[i]);
+        }
+        else
+        {
+            printf("Assigned Ward     : Not admitted\n");
+        }
+
+        if(patientUrgency[i]==3)
+        {
+            printf("Urgency Level     : Level 3 (Critical)\n");
+        }
+        else if(patientUrgency[i]==2)
+        {
+            printf("Urgency Level     : Level 2 (Urgent)\n");
+        }
+        else
+        {
+            printf("Urgency Level     : Level 1 (Normal)\n");
+        }
+
+
+        printf("----------------------------------------------------\n");
+        printf("Base Consultation Fee     : LKR %.2f\n",patientConsultationCost[i]);
+        printf("Emergency Surcharge       : LKR %.2f\n",patientEmergencySurcharge[i]);
+        printf("Ward Stay Cost (%d Days)  : LKR %.2f\n",patientDays[i],patientWardCost[i]);
+
+        printf("----------------------------------------------------\n");
+        printf("Gross Total Bill          : LKR %.2f\n",patientGrossTotal[i]);
+        printf("Age Subsidy Discount      : LKR -%.2f\n",patientAgeSubsidyDiscount[i]);
+
+        printf("-----------------------------------------------------\n");
+        printf("Final Payable Amount      : LKR %.2f\n",patientFinalPayable[i]);
+        printf("Estimated Waiting Time    : %.2f mins",(float)patientWaitTime[i]);
+        if(patientWaitTime[i]==0)
+        {
+            printf("(Immediate Attention)");
+        }
+        printf("\n\n");
+        printf("====================================================\n");
+
+
+
+    }
+
+
+}
+
+int assignBed(int selectedWard,int bedOccupancy[][20])
+{
+    int j;
+
+    for(j=0;j<20;j++)
+    {
+        if(bedOccupancy[selectedWard-1][j]==0)
+        {
+            bedOccupancy[selectedWard-1][j]=1;
+            return j+1;
+        }
+    }
+    return 0;
 }
 
