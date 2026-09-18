@@ -17,6 +17,8 @@ void displayBill(char patientName[][50],int patientAge[],int patientUrgency[],in
                  float patientGrossTotal[],float patientAgeSubsidyDiscount[],float patientFinalPayable[],int patients);
 
 int assignBed(int selectedWard,int bedOccupancy[][20]);
+void performanceReport(int patients,int patientUrgency[],float patientFinalPayable[],float patientAgeSubsidyDiscount[],char patientsName[][50],
+                       int patientAdmitted[],int patientWard[],int bedOccupancy[][20],int totalBedCapacity[]);
 int main()
 
 {   char patientName[60];
@@ -67,6 +69,8 @@ int main()
 
     int bedOccupancy[4][20]={0};
     int patientBed[MAX_PATIENTS];
+
+    int choice;
 
 
     printf("Smart Hospital & Resource Allocation System\n\n");
@@ -215,11 +219,27 @@ int main()
     }
 
 
+    printf("\n");
 
 
+    printf("\n====MENU====\t\n");
+    printf("1.Display patient Bills\n");
+    printf("2.Performance Reports & Analytics\n");
+    printf("Enter your choice: ");
+    scanf("%d",&choice);
 
-    displayBill(patientsName,patientAge,patientUrgency,patientSpecialty,specialtyName,patientAdmitted,patientWard,patientBed,wardName,patientDays,
-                patientConsultationCost,patientWaitTime,patientEmergencySurcharge,patientWardCost,patientGrossTotal,patientAgeSubsidyDiscount,patientFinalPayable,patients);
+    if(choice==1)
+    {
+        displayBill(patientsName,patientAge,patientUrgency,patientSpecialty,specialtyName,patientAdmitted,patientWard,patientBed,wardName,patientDays,
+                   patientConsultationCost,patientWaitTime,patientEmergencySurcharge,patientWardCost,patientGrossTotal,patientAgeSubsidyDiscount,patientFinalPayable,patients);
+
+    }
+    else if(choice==2)
+    {
+        performanceReport(patients,patientUrgency,patientFinalPayable,patientAgeSubsidyDiscount,
+                          patientsName,patientAdmitted,patientWard,bedOccupancy,totalBedCapacity);
+    }
+
 
 
     return 0;
@@ -361,7 +381,7 @@ void displayBill(char patientsName[][50],int patientAge[],int patientUrgency[],i
         printf("\tSMART HOSPITAL ADMISSION & BILL\t\n");
         printf("-------------------------------------------------------\n");
 
-        printf("Patient Name             : %s\n", patientsName[i]);
+        printf("Patient Name          : %s\n", patientsName[i]);
 
         if(patientAge[i] < 5 || patientAge[i] > 65)
         {
@@ -436,5 +456,90 @@ int assignBed(int selectedWard,int bedOccupancy[][20])
         }
     }
     return 0;
+}
+
+
+void performanceReport(int patients,int patientUrgency[],float patientFinalPayable[],float patientAgeSubsidyDiscount[],char patientsName[][50],
+                       int patientAdmitted[],int patientWard[],int bedOccupancy[][20],int totalBedCapacity[])
+
+{
+    int i,j;
+    int countNormal = 0;
+    int countUrgent = 0;
+    int countCritical = 0;
+    float totalRevenue = 0;
+    float totalDiscount = 0;
+    int occupiedBeds;
+    float percentage;
+    int highestPatient =0;
+    float highestBill =0;
+
+
+    for(i=0;i<patients;i++)
+    {
+        if(patientUrgency[i]==1)
+        {
+            countNormal++;
+        }
+        else if(patientUrgency[i]==2)
+        {
+            countUrgent++;
+        }
+        else
+        {
+            countCritical++;
+        }
+    }
+
+    printf("\n\tPERFORMANCE REPORT\t\n");
+    printf("Total Patients registered: %d\n",patients);
+    printf("Normal patients          : %d\n",countNormal);
+    printf("Urgent patients          : %d\n",countUrgent);
+    printf("Critical patients        : %d\n",countCritical);
+
+    for(i=0;i<patients;i++)
+    {
+        totalRevenue +=patientFinalPayable[i];
+        totalDiscount+=patientAgeSubsidyDiscount[i];
+    }
+
+    printf("Total Revenue Earned     : LKR %.2f\n",totalRevenue);
+    printf("Total Discounts          : LKR %.2f\n",totalDiscount);
+
+    printf("\nBed Occupancy\n");
+
+    for(i=0;i<4;i++)
+    {
+        occupiedBeds=0;
+
+        for(j=0;j<totalBedCapacity[i];j++)
+        {
+            if(bedOccupancy[i][j]==1)
+            {
+                occupiedBeds++;
+            }
+        }
+
+        percentage=(float)occupiedBeds/totalBedCapacity[i]*100;
+
+        printf("Ward %d Occupancy     : %.2f%%\n",i+1,percentage);
+    }
+
+
+    printf("\nHighest paying patient\n");
+
+    for(i=0;i<patients;i++)
+    {
+        if(patientFinalPayable[i]>highestBill)
+        {
+            highestBill = patientFinalPayable[i];
+            highestPatient = i;
+        }
+    }
+
+    printf("Patient Name      :%s\n",patientsName[highestPatient]);
+    printf("Total Bill        :LKR %.2f\n",highestBill);
+
+
 }
 
