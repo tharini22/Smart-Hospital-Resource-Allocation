@@ -18,17 +18,15 @@ void displayBill(char patientName[][50],int patientAge[],int patientUrgency[],in
 
 int assignBed(int selectedWard,int bedOccupancy[][20]);
 void performanceReport(int patients,int patientUrgency[],float patientFinalPayable[],float patientAgeSubsidyDiscount[],char patientsName[][50],
-                       int patientAdmitted[],int patientWard[],int bedOccupancy[][20],int totalBedCapacity[]);
+                       int patientAdmitted[],int patientWard[],int bedOccupancy[][20],const int totalBedCapacity[]);
+
+void saveBedStatus(int bedOccupancy[][20],const int totalBedCapacity[]);
+void loadBedStatus(int bedOccupancy[][20],const int totalBedCapacity[]);;
+void savePatientRecord(char patientsName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[],int patientAdmitted[],int patientWard[],int patientDays[],float patientConsultationCost[],float patientEmergencySurcharge[],
+                       float patientWardCost[],float patientGrossTotal[],float patientAgeSubsidyDiscount[],float patientFinalPayable[],int patients);
 int main()
 
-{   char patientName[60];
-    int age;
-    int urgency;
-    int selectedSpecialty;
-    int admitted;
-    int selectedWard;
-    int admittedDays;
-
+{
     char patientsName[MAX_PATIENTS][50];
     int patientAge[MAX_PATIENTS];
     int patientUrgency[MAX_PATIENTS];
@@ -47,13 +45,7 @@ int main()
     float patientAgeSubsidyDiscount[MAX_PATIENTS];
     float patientFinalPayable[MAX_PATIENTS];
 
-    float consultationCost;
-    int waitTime;
-    float emergencySurcharge;
-    float wardCost;
-    float grossTotal;
-    float ageSubsidyDiscount;
-    float finalPayable;
+
     const int specialtyId[4]={1,2,3,4};
     const char specialtyName[4][30]={"General Practice(OPD)","Paediatrics","Cardiology","Neurology"};
     const float consultationFee[4]={1500.00,2500.00,4500.00,5000.00};
@@ -72,6 +64,7 @@ int main()
 
     int choice;
 
+    loadBedStatus(bedOccupancy,totalBedCapacity);
 
     printf("Smart Hospital & Resource Allocation System\n\n");
 
@@ -218,6 +211,11 @@ int main()
         }
     }
 
+    saveBedStatus(bedOccupancy,totalBedCapacity);
+
+    savePatientRecord(patientsName,patientAge,patientUrgency,patientSpecialty,patientAdmitted,patientWard,patientDays,patientConsultationCost,patientEmergencySurcharge,
+                      patientWardCost,patientGrossTotal,patientAgeSubsidyDiscount,patientFinalPayable,patients);
+
 
     printf("\n");
 
@@ -239,6 +237,8 @@ int main()
         performanceReport(patients,patientUrgency,patientFinalPayable,patientAgeSubsidyDiscount,
                           patientsName,patientAdmitted,patientWard,bedOccupancy,totalBedCapacity);
     }
+
+
 
 
 
@@ -385,7 +385,7 @@ void displayBill(char patientsName[][50],int patientAge[],int patientUrgency[],i
 
         if(patientAge[i] < 5 || patientAge[i] > 65)
         {
-            printf("Age               : %d Years (15%% Subsidy Eligible)\n",patientAge[i]);
+            printf("Age                : %d Years (15%% Subsidy Eligible)\n",patientAge[i]);
         }
         else
         {
@@ -460,7 +460,7 @@ int assignBed(int selectedWard,int bedOccupancy[][20])
 
 
 void performanceReport(int patients,int patientUrgency[],float patientFinalPayable[],float patientAgeSubsidyDiscount[],char patientsName[][50],
-                       int patientAdmitted[],int patientWard[],int bedOccupancy[][20],int totalBedCapacity[])
+                       int patientAdmitted[],int patientWard[],int bedOccupancy[][20],const int totalBedCapacity[])
 
 {
     int i,j;
@@ -543,3 +543,81 @@ void performanceReport(int patients,int patientUrgency[],float patientFinalPayab
 
 }
 
+
+void saveBedStatus(int bedOccupancy[][20],const int totalBedCapacity[])
+{
+    FILE*file;
+    int i,j;
+
+    file=fopen("beds_status.txt","w");
+    if(file==NULL)
+    {
+        printf("Error opening beds_status.txt\n");
+        return;
+    }
+    for(i=0;i<4;i++)
+    {
+        for(j=0;j<totalBedCapacity[i];j++)
+        {
+            fprintf(file,"%d",bedOccupancy[i][j]);
+        }
+        fprintf(file,"\n");
+    }
+    fclose(file);
+    printf("Bed status saved.\n");
+}
+
+void loadBedStatus(int bedOccupancy[][20],const int totalBedCapacity[])
+{
+    FILE*file;
+    int i,j;
+
+    file=fopen("bed_status.txt","r");
+    if(file==NULL)
+    {
+        return;
+    }
+    for(i=0;i<4;i++)
+    {
+        for(j=0;j<totalBedCapacity[i];j++)
+        {
+            fscanf(file,"%d",&bedOccupancy[i][j]);
+        }
+    }
+    fclose(file);
+}
+
+void savePatientRecord(char patientsName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[],int patientAdmitted[],int patientWard[],int patientDays[],float patientConsultationCost[],float patientEmergencySurcharge[],
+                       float patientWardCost[],float patientGrossTotal[],float patientAgeSubsidyDiscount[],float patientFinalPayable[],int patients)
+
+{
+    FILE *file;
+    int i;
+
+    file= fopen("patient_records.txt","a");
+    if(file==NULL)
+    {
+        printf("Error opening patient_record.txt\n");
+        return;
+    }
+
+    for(i=0;i<patients;i++)
+    {
+        fprintf(file,"Patient Name: %s\n",patientsName[i]);
+        fprintf(file,"Age: %d\n",patientAge[i]);
+        fprintf(file,"Urgency: %d\n",patientUrgency[i]);
+        fprintf(file,"Specialty ID: %d\n",patientSpecialty[i]);
+        fprintf(file,"Admitted: %d\n",patientAdmitted[i]);
+        fprintf(file,"Ward ID: %d\n",patientWard[i]);
+        fprintf(file,"Days: %d\n",patientDays[i]);
+        fprintf(file,"Consultation Cost: %.2f\n",patientConsultationCost[i]);
+        fprintf(file,"Emergency Surcharge: %.2f\n",patientEmergencySurcharge[i]);
+        fprintf(file,"Ward cost: %.2f\n",patientWardCost[i]);
+        fprintf(file,"Gross Total: %.2f\n", patientGrossTotal[i]);
+        fprintf(file,"Age Subsidy: %.2f\n",patientAgeSubsidyDiscount[i]);
+        fprintf(file,"Final Payable: %.2f\n",patientFinalPayable[i]);
+        fprintf(file,"\n");
+    }
+    fclose(file);
+    printf("patient records saved.\n");
+}
